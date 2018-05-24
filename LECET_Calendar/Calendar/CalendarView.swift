@@ -32,6 +32,7 @@ class CalendarView: UIView {
     private var currentYear = 0
     
     private var flowLayout : CalendarFlowLayout?
+    private var scrolledInitially = false
     
     var presentingDate = Date() {
         didSet {
@@ -52,6 +53,7 @@ class CalendarView: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         flowLayout?.itemSize = CGSize(width: calendarCollectionView.frame.size.width / 7, height: calendarCollectionView.frame.size.height / 5)
+        scrollInitially()
     }
     
     override init(frame: CGRect) {
@@ -72,6 +74,13 @@ class CalendarView: UIView {
         print("--------------------------")
         print("reloaded")
         reloadData()
+    }
+    
+    private func scrollInitially() {
+        if !scrolledInitially {
+            calendarCollectionView.setContentOffset(CGPoint(x: calendarCollectionView.bounds.width, y: 0.f), animated: false)
+            scrolledInitially = true
+        }
     }
     
     func reloadData() {
@@ -180,39 +189,30 @@ extension CalendarView: UICollectionViewDataSource {
         
     }
     
-    func isPresentDateFor(indexPath : IndexPath) -> Bool {
-        let currentIterationInfo = getTheCurrentIterationIndexForCurrentDate()
-        return (numberOfIterations == currentIterationInfo.0 && indexPath == (currentIterationInfo.1) && highlightCurrentDate)
-    }
-    
     //Gives the current date index and the iteration index for the present day
-    private func getTheCurrentIterationIndexForCurrentDate() -> (Int, IndexPath) {
-        
-        _ = getDateComponents(date: presentingDate)
-        let year1 = dateComponents.year
-        let month1 = dateComponents.month
+    private func isMatchingWithCurrentDateFor(indexPath: IndexPath) -> Bool {
         
         _ = getDateComponents(date: Date())
-        let year2 = dateComponents.year
-        let day2 = dateComponents.day
-        let month2 = dateComponents.month
+        let year = dateComponents.year ?? 0
+        let day = dateComponents.day ?? 0
+        let month = dateComponents.month ?? 0
         
-        let yearDifference = (year1 ?? 0) - (year2 ?? 0)
-        let differenceBWMonths = (yearDifference * (12 - (month1 ?? 0) + 12 - (month2 ?? 0)))
+        print(currentYear)
+        print(currentMonth)
+        if currentMonth == month && currentYear == year && day == indexPath.item + 1 {
+            return true
+        }
         
-        let currentNumberOfIterationForCurrentDay = floor(differenceBWMonths.f / 3)
-        
-        let currentMonthIndex = differenceBWMonths % 3 + 1
-        let indexPath = IndexPath(item: (day2 ?? 0) - 1, section: currentMonthIndex)
-        
-        return (Int(currentNumberOfIterationForCurrentDay), indexPath)
+        return false
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CalendarCollectionViewCell", for: indexPath) as? CalendarCollectionViewCell
         cell?.dateButton.setTitle("\(indexPath.item + 1)", for: .normal)
         
-        if isPresentDateFor(indexPath: indexPath) {
+        cell?.dateButton.backgroundColor = UIColor(red: 41/255, green: 160/255, blue: 249/255, alpha: 1)
+        
+        if isMatchingWithCurrentDateFor(indexPath: indexPath) {
             cell?.dateButton.backgroundColor = .blue
         }
         
