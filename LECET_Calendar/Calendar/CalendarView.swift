@@ -197,8 +197,8 @@ extension CalendarView: UICollectionViewDataSource {
         let day = dateComponents.day ?? 0
         let month = dateComponents.month ?? 0
         
-        print(currentYear)
-        print(currentMonth)
+        let currentYear = getCurrentYearFor(section: indexPath.section)
+        let currentMonth = getCurrentMonthFor(section: indexPath.section)
         if currentMonth == month && currentYear == year && day == indexPath.item + 1 {
             return true
         }
