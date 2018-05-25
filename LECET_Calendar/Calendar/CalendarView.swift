@@ -153,7 +153,7 @@ class CalendarView: UIView {
             yearMonthButton.setTitle("Jan 2016", for: .normal)
             
             yearMonthButton.titleLabel?.textColor = UIColor.white
-            yearMonthButton.backgroundColor = UIColor.blue
+            yearMonthButton.backgroundColor = UIColor(red: 41/255, green: 160/255, blue: 249/255, alpha: 1)
             yearMonthButton.translatesAutoresizingMaskIntoConstraints = false
             yearMonthButton.titleLabel?.textAlignment = .center
             yearMonthButton.addTarget(self, action: #selector(CalendarView.yearMonthButtonDidClick(_:)), for: .touchUpInside)
@@ -169,7 +169,7 @@ class CalendarView: UIView {
     private func addConstraintToMonthAndYearLabels() {
         
         let topConstraint = NSLayoutConstraint(item: yearMonthButton, attribute: .top, relatedBy: .equal, toItem: self, attribute: .top, multiplier: 1, constant: 0)
-        let leadingConstraint = NSLayoutConstraint(item: yearMonthButton, attribute: .leading, relatedBy: .equal, toItem: self, attribute: .leading, multiplier: 1, constant: 10)
+        let leadingConstraint = NSLayoutConstraint(item: yearMonthButton, attribute: .leading, relatedBy: .equal, toItem: self, attribute: .leading, multiplier: 1, constant: 0)
         let heightConstraint = NSLayoutConstraint(item: yearMonthButton, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 30)
         
         addConstraints([topConstraint, leadingConstraint])
@@ -194,7 +194,7 @@ class CalendarView: UIView {
             label.textColor = UIColor.white
             label.textAlignment = .center
             label.translatesAutoresizingMaskIntoConstraints = false
-            label.backgroundColor = UIColor.blue
+            label.backgroundColor = UIColor(red: 41/255, green: 160/255, blue: 249/255, alpha: 1)
             label.frame = CGRect(x: index.f * bounds.width / kNumberOfDaysInAWeek.f , y: 0, width: bounds.width / kNumberOfDaysInAWeek.f, height: 30)
             addSubview(label)
             
@@ -296,7 +296,6 @@ class CalendarView: UIView {
         
         let leading = NSLayoutConstraint(item: calendarCollectionView, attribute: .leading, relatedBy: .equal, toItem: self, attribute: .leading, multiplier: 1, constant: 0)
         let trailing = NSLayoutConstraint(item: calendarCollectionView, attribute: .trailing, relatedBy: .equal, toItem: self, attribute: .trailing, multiplier: 1, constant: 0)
-//        let top = NSLayoutConstraint(item: calendarCollectionView, attribute: .top, relatedBy: .equal, toItem: self, attribute: .top, multiplier: 1, constant: 0)
         let bottom = NSLayoutConstraint(item: calendarCollectionView, attribute: .bottom, relatedBy: .equal, toItem: self, attribute: .bottom, multiplier: 1, constant: 0)
         
         addConstraints([leading, trailing, bottom])
