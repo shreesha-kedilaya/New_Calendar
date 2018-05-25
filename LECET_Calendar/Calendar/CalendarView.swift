@@ -8,6 +8,93 @@
 
 import UIKit
 
+extension String {
+    
+    subscript (i: Int) -> Character {
+        return self[self.index(self.startIndex, offsetBy: i)]
+    }
+    
+    subscript (i: Int) -> String {
+        return String(self[i] as Character)
+    }
+    
+    subscript (r: CountableClosedRange<Int>) -> String {
+        let start = self.index(self.startIndex, offsetBy: r.lowerBound)
+        let end = self.index(self.startIndex, offsetBy: r.upperBound)
+        return String(self[Range(start ..< end)])
+    }
+}
+
+
+enum Months : Int {
+    case January = 1,
+    February,
+    March,
+    April,
+    May,
+    June,
+    July,
+    August,
+    September,
+    October,
+    November,
+    December
+    
+    func name() -> String {
+        return "\(self)"
+    }
+}
+
+enum Week : Int{
+    case Sunday = 1,
+    Monday,
+    Tuesday,
+    Wednesday,
+    Thursday,
+    Friday,
+    Saturday
+    
+    func name(style : WeekStyles, casingStyle : CasingStyle) -> String {
+        
+        var range = 0...0
+        switch style {
+        case .One:
+            range = 0...0
+        case .Two:
+            range = 0...1
+        case .Three :
+            range = 0...2
+        default :
+            range = 0...("\(self)".count - 1)
+        }
+        
+        return casingStyle.letter(forString: "\(self)"[range])
+    }
+}
+enum WeekStyles : Int{
+    case One = 10,
+    Two,
+    Three,
+    Full
+}
+
+enum CasingStyle {
+    case FirstLetterUpper,
+    AllUpper,
+    AllLower
+    
+    func letter(forString : String) -> String {
+        switch self {
+        case .FirstLetterUpper:
+            return forString
+        case .AllLower:
+            return forString.lowercased()
+        case .AllUpper :
+            return forString.uppercased()
+        }
+    }
+}
+
 class CalendarView: UIView {
     
     enum BoundaryPositions {
@@ -30,6 +117,8 @@ class CalendarView: UIView {
     private var currentSection = 0
     private var currentMonth = 0
     private var currentYear = 0
+    private var yearMonthButton : UIButton!
+    private var weekLabels : [UILabel]!
     
     private var flowLayout : CalendarFlowLayout?
     private var scrolledInitially = false
@@ -56,6 +145,102 @@ class CalendarView: UIView {
         scrollInitially()
     }
     
+    private func createMonthAndYearLabels() {
+        
+        if yearMonthButton == nil {
+            
+            yearMonthButton = UIButton(frame: CGRect(x: 0, y: 0, width: frame.size.width / 2, height: 30))
+            yearMonthButton.setTitle("Jan 2016", for: .normal)
+            
+            yearMonthButton.titleLabel?.textColor = UIColor.white
+            yearMonthButton.backgroundColor = UIColor.blue
+            yearMonthButton.translatesAutoresizingMaskIntoConstraints = false
+            yearMonthButton.titleLabel?.textAlignment = .center
+            yearMonthButton.addTarget(self, action: #selector(CalendarView.yearMonthButtonDidClick(_:)), for: .touchUpInside)
+            addSubview(yearMonthButton)
+            addConstraintToMonthAndYearLabels()
+        }
+    }
+    
+    @objc func yearMonthButtonDidClick(_ sender : UIButton) {
+        print("Year month button clicked")
+    }
+    
+    private func addConstraintToMonthAndYearLabels() {
+        
+        let topConstraint = NSLayoutConstraint(item: yearMonthButton, attribute: .top, relatedBy: .equal, toItem: self, attribute: .top, multiplier: 1, constant: 0)
+        let leadingConstraint = NSLayoutConstraint(item: yearMonthButton, attribute: .leading, relatedBy: .equal, toItem: self, attribute: .leading, multiplier: 1, constant: 10)
+        let heightConstraint = NSLayoutConstraint(item: yearMonthButton, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 30)
+        
+        addConstraints([topConstraint, leadingConstraint])
+        yearMonthButton.addConstraint(heightConstraint)
+    }
+    
+    private func createWeekLabels() {
+        
+        if let weekLabels = weekLabels {
+            for label in weekLabels {
+                label.removeFromSuperview()
+            }
+        }
+        weekLabels = []
+        
+        for index in 0..<kNumberOfDaysInAWeek {
+            let label = UILabel()
+            if let text = Week(rawValue: index + 1)?.name(style: .Three, casingStyle: .AllUpper) {
+                label.text = text
+            }
+            label.font = UIFont.systemFont(ofSize: 14)
+            label.textColor = UIColor.white
+            label.textAlignment = .center
+            label.translatesAutoresizingMaskIntoConstraints = false
+            label.backgroundColor = UIColor.blue
+            label.frame = CGRect(x: index.f * bounds.width / kNumberOfDaysInAWeek.f , y: 0, width: bounds.width / kNumberOfDaysInAWeek.f, height: 30)
+            addSubview(label)
+            
+            
+            //adding constraint to week labels
+            var topConstraint : NSLayoutConstraint
+            var bottomConstraint : NSLayoutConstraint
+            var leadingConstraint : NSLayoutConstraint
+            var trailingConstraint : NSLayoutConstraint?
+            
+            switch index {
+            //first item
+            case 0:
+                
+                topConstraint = NSLayoutConstraint(item: label, attribute: .top, relatedBy: .equal, toItem: yearMonthButton, attribute: .bottom, multiplier: 1, constant: 10)
+                bottomConstraint = NSLayoutConstraint(item: label, attribute: .bottom, relatedBy: .equal, toItem: calendarCollectionView, attribute: .top, multiplier: 1, constant: 0)
+                leadingConstraint = NSLayoutConstraint(item: label, attribute: .leading, relatedBy: .equal, toItem: self, attribute: .leading, multiplier: 1, constant: 0)
+                //No trailing constraint required
+                
+            //Last label
+            case kNumberOfDaysInAWeek-1:
+                
+                topConstraint = NSLayoutConstraint(item: label, attribute: .top, relatedBy: .equal, toItem: yearMonthButton, attribute: .bottom, multiplier: 1, constant: 10)
+                bottomConstraint = NSLayoutConstraint(item: label, attribute: .bottom, relatedBy: .equal, toItem: calendarCollectionView, attribute: .top, multiplier: 1, constant: 0)
+                leadingConstraint = NSLayoutConstraint(item: label, attribute: .leading, relatedBy: .equal, toItem:weekLabels[index-1] , attribute: .trailing, multiplier: 1, constant: 0)
+                trailingConstraint = NSLayoutConstraint(item: label, attribute: .trailing, relatedBy: .equal, toItem: self, attribute: .trailing, multiplier: 1, constant: 0)
+                
+            default :
+                
+                topConstraint = NSLayoutConstraint(item: label, attribute: .top, relatedBy: .equal, toItem: yearMonthButton, attribute: .bottom, multiplier: 1, constant: 10)
+                bottomConstraint = NSLayoutConstraint(item: label, attribute: .bottom, relatedBy: .equal, toItem: calendarCollectionView, attribute: .top, multiplier: 1, constant: 0)
+                leadingConstraint = NSLayoutConstraint(item: label, attribute: .leading, relatedBy: .equal, toItem: weekLabels[index-1], attribute: .trailing, multiplier: 1, constant: 0)
+                
+            }
+            
+            let widthAttribute = NSLayoutConstraint(item: label, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: bounds.width / kNumberOfDaysInAWeek.f)
+            widthAttribute.priority = UILayoutPriority.defaultHigh
+            if let trailingConstraint = trailingConstraint {
+                addConstraint(trailingConstraint)
+            }
+            addConstraints([leadingConstraint,topConstraint,bottomConstraint])
+            label.addConstraint(widthAttribute)
+            weekLabels.append(label)
+        }
+    }
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
     }
@@ -67,6 +252,8 @@ class CalendarView: UIView {
     
     private func sharedInit() {
         initializeCollectionView()
+        createMonthAndYearLabels()
+        createWeekLabels()
         registerCell()
         
         changeTheDateComponent()
@@ -85,6 +272,7 @@ class CalendarView: UIView {
     
     func reloadData() {
         calendarCollectionView.reloadData()
+        changeTheTextOfYearMonthLabel()
     }
     
     private func registerCell() {
@@ -105,12 +293,13 @@ class CalendarView: UIView {
     }
     
     private func addConstraintsToView() {
+        
         let leading = NSLayoutConstraint(item: calendarCollectionView, attribute: .leading, relatedBy: .equal, toItem: self, attribute: .leading, multiplier: 1, constant: 0)
         let trailing = NSLayoutConstraint(item: calendarCollectionView, attribute: .trailing, relatedBy: .equal, toItem: self, attribute: .trailing, multiplier: 1, constant: 0)
-        let top = NSLayoutConstraint(item: calendarCollectionView, attribute: .top, relatedBy: .equal, toItem: self, attribute: .top, multiplier: 1, constant: 0)
+//        let top = NSLayoutConstraint(item: calendarCollectionView, attribute: .top, relatedBy: .equal, toItem: self, attribute: .top, multiplier: 1, constant: 0)
         let bottom = NSLayoutConstraint(item: calendarCollectionView, attribute: .bottom, relatedBy: .equal, toItem: self, attribute: .bottom, multiplier: 1, constant: 0)
         
-        addConstraints([leading, trailing, top, bottom])
+        addConstraints([leading, trailing, bottom])
     }
 }
 
@@ -148,6 +337,8 @@ extension CalendarView: UICollectionViewDelegateFlowLayout {
                 self.reloadCollectionViewAttributesFor(position: .backward)
             }
         }
+        
+        changeTheTextOfYearMonthLabel()
     }
     
     private func reloadCollectionViewAttributesFor(position : BoundaryPositions){
@@ -180,13 +371,7 @@ extension CalendarView: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        dateComponents.day = 1
-        dateComponents.month = getCurrentMonthFor(section: section)
-        dateComponents.year = getCurrentYearFor(section: section)
-        let numberOfItems = totalDaysForCurrentMonth()
-        
-        return numberOfItems
-        
+        return 35
     }
     
     //Gives the current date index and the iteration index for the present day
@@ -199,7 +384,13 @@ extension CalendarView: UICollectionViewDataSource {
         
         let currentYear = getCurrentYearFor(section: indexPath.section)
         let currentMonth = getCurrentMonthFor(section: indexPath.section)
-        if currentMonth == month && currentYear == year && day == indexPath.item + 1 {
+        
+        dateComponents.month = currentMonth
+        dateComponents.year = currentYear
+        
+        let firstDay = startingRangeOfDay() - 1
+        
+        if currentMonth == month && currentYear == year && day == (indexPath.item + 1 - firstDay) {
             return true
         }
         
@@ -208,8 +399,8 @@ extension CalendarView: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CalendarCollectionViewCell", for: indexPath) as? CalendarCollectionViewCell
-        cell?.dateButton.setTitle("\(indexPath.item + 1)", for: .normal)
-        
+
+        cell?.dateButton.setTitle(getTheTitleFor(indexPath: indexPath), for: .normal)
         cell?.dateButton.backgroundColor = UIColor(red: 41/255, green: 160/255, blue: 249/255, alpha: 1)
         
         if isMatchingWithCurrentDateFor(indexPath: indexPath) {
@@ -217,6 +408,35 @@ extension CalendarView: UICollectionViewDataSource {
         }
         
         return cell ?? UICollectionViewCell()
+    }
+    
+    private func getTheTitleFor(indexPath: IndexPath) -> String {
+        dateComponents.month = getCurrentMonthFor(section: indexPath.section)
+        dateComponents.year = getCurrentYearFor(section: indexPath.section)
+        
+        let firstDay = startingRangeOfDay() - 1
+        let numberOfDays = totalDaysForCurrentMonth()
+        
+        if dateComponents.month == 6 {
+            print("Here we are")
+        }
+        
+        dateComponents.month = getCurrentMonthFor(section: indexPath.section - 1)
+        dateComponents.month = getCurrentMonthFor(section: indexPath.section - 1)
+        let previousMonthDays = totalDaysForCurrentMonth()
+        
+        var currentDay = 0
+        
+        if indexPath.item < firstDay {
+            currentDay = indexPath.item + 1 - firstDay + previousMonthDays
+        } else if indexPath.item + 1 > (numberOfDays + firstDay) {
+            currentDay = indexPath.item + 1 - numberOfDays - firstDay
+            print(currentDay)
+        } else {
+            currentDay = indexPath.item + 1 - firstDay
+        }
+        
+        return "\(currentDay)"
     }
 }
 
@@ -234,6 +454,20 @@ extension CalendarView {
     
     private func rangeOfMonthToBeAdded() -> Int{
         return numberOfIterations * kCellsVisibleToTheUser
+    }
+    
+    private func changeTheTextOfYearMonthLabel() {
+        
+        UIView.animate(withDuration: 0.2, animations: {
+            self.yearMonthButton.alpha = 0
+        }) { (completion) in
+            UIView.animate(withDuration: 0.2, animations: {
+                self.yearMonthButton.alpha = 1.0
+                if let name = Months(rawValue: self.currentMonth)?.name() {
+                    self.yearMonthButton.setTitle("\(name) \(self.currentYear)", for: .normal)
+                }
+            })
+        }
     }
     
     private func changeTheDateComponent() {

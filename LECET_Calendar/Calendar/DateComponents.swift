@@ -42,9 +42,9 @@ func startingRangeOfDay() -> Int {
 }
 
 func getNumberOfWeek() -> Int {
-    if let total = calendar.range(of: .weekOfMonth, in: .month, for: getActualDatefromCalendar())?.count {
-        return total
-    }
+//    if let total = calendar.range(of: .weekOfMonth, in: .month, for: getActualDatefromCalendar())?.count {
+//        return total
+//    }
     
-    return 0
+    return 5
 }

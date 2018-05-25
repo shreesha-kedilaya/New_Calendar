@@ -52,13 +52,18 @@ class CalendarFlowLayout: UICollectionViewFlowLayout {
             dateComponents.year = getCurrentYearFor(section: section)
             
             let firstDay = startingRangeOfDay() - 1
+            let numberOfDays = totalDaysForCurrentMonth()
             
             let heightOfItems = collectionView.frame.height / getNumberOfWeek().f
 
-            let xOffset = ( (item + firstDay) % 7 == 0) ? (section.f * collectionView.frame.size.width) : (section.f * collectionView.frame.size.width + ( (item + firstDay) % 7 ).f * itemSize.width )
-            let yOffset = ( (item + firstDay) / 7 ).f * heightOfItems
+            let xOffset = ( item % 7 == 0) ? (section.f * collectionView.frame.size.width) : (section.f * collectionView.frame.size.width + ( item % 7 ).f * itemSize.width )
+            let yOffset = ( item / 7 ).f * heightOfItems
             
             attributes.frame = CGRect(x: xOffset, y: yOffset, width: itemSize.width, height: heightOfItems)
+            
+            if item < firstDay || (item + 1) > (numberOfDays + firstDay) {
+                attributes.alpha = 0.5
+            }
             
             return attributes
         }
