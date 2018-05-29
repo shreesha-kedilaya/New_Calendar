@@ -194,7 +194,7 @@ class CalendarView: UIView {
             label.textColor = UIColor.white
             label.textAlignment = .center
             label.translatesAutoresizingMaskIntoConstraints = false
-            label.backgroundColor = UIColor(red: 41/255, green: 160/255, blue: 249/255, alpha: 1)
+            label.backgroundColor = UIColor.black
             label.frame = CGRect(x: index.f * bounds.width / kNumberOfDaysInAWeek.f , y: 0, width: bounds.width / kNumberOfDaysInAWeek.f, height: 30)
             addSubview(label)
             
@@ -282,14 +282,13 @@ class CalendarView: UIView {
     
     private func initializeCollectionView() {
         flowLayout = CalendarFlowLayout()
-        
         calendarCollectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: flowLayout!)
         addSubview(calendarCollectionView)
         calendarCollectionView.translatesAutoresizingMaskIntoConstraints = false
         addConstraintsToView()
         calendarCollectionView.dataSource = self
         calendarCollectionView.delegate = self
-        (calendarCollectionView.collectionViewLayout as? UICollectionViewFlowLayout)?.scrollDirection = .horizontal
+        flowLayout?.scrollDirection = .horizontal
         calendarCollectionView.isPagingEnabled = true
     }
     
@@ -304,10 +303,6 @@ class CalendarView: UIView {
 }
 
 extension CalendarView: UICollectionViewDelegateFlowLayout {
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        
-    }
-    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
         return 0
     }
@@ -320,7 +315,7 @@ extension CalendarView: UICollectionViewDelegateFlowLayout {
         
         currentSection = Int(floor(targetContentOffset.pointee.x / calendarCollectionView.bounds.width)) + 1
         
-        currentMonth = getCurrentMonthFor(section: currentSection - 1) + 1
+        currentMonth = getCurrentMonthFor(section: currentSection - 1)
         currentYear = getCurrentYearFor(section: currentSection - 1)
         
         if currentSection.f >= kDefaultNumberOfSections.f {
@@ -371,7 +366,7 @@ extension CalendarView: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 35
+        return 42
     }
     
     //Gives the current date index and the iteration index for the present day

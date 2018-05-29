@@ -46,5 +46,5 @@ func getNumberOfWeek() -> Int {
 //        return total
 //    }
     
-    return 5
+    return 6
 }

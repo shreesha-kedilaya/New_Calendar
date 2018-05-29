@@ -59,7 +59,7 @@ class CalendarCollectionViewCell: UICollectionViewCell {
         dateButton.removeConstraint(widthConstraint)
         dateButton.removeConstraint(aspectRatioConstraint)
         
-        widthConstraint = NSLayoutConstraint(item: dateButton, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: minimumDimension - 2)
+        widthConstraint = NSLayoutConstraint(item: dateButton, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: minimumDimension - 7)
         aspectRatioConstraint = NSLayoutConstraint(item: dateButton, attribute: .width, relatedBy: .equal, toItem:dateButton, attribute: .height, multiplier: 1, constant: 0)
         
         dateButton.addConstraints([widthConstraint, aspectRatioConstraint])

@@ -16,13 +16,23 @@ class CalendarFlowLayout: UICollectionViewFlowLayout {
     var presentingYear = 0
     var currentIterationIndex = 0
     
+    override init() {
+        super.init()
+        self.scrollDirection = .horizontal
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        self.scrollDirection = .horizontal
+    }
+    
     override func layoutAttributesForItem(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
         return addAttributes(forIndexPath: indexPath)
     }
     
     override var collectionViewContentSize: CGSize {
         if let collectionView = collectionView {
-            return CGSize(width: collectionView.numberOfSections.f * collectionView.frame.size.width, height: collectionView.frame.size.height)
+            return CGSize(width: collectionView.numberOfSections.f * itemSize.width * 7, height: collectionView.frame.size.height)
         }else {
             return CGSize.zero
         }
@@ -36,6 +46,9 @@ class CalendarFlowLayout: UICollectionViewFlowLayout {
         var array = [UICollectionViewLayoutAttributes]()
         for index in 0..<elements.count {
             if let attributes = addAttributes(forIndexPath:(elements[index].indexPath)) {
+                if elements[index].indexPath.section == 3 {
+                    print(elements.count)
+                }
                 array.append(attributes)
             }
         }
@@ -60,6 +73,13 @@ class CalendarFlowLayout: UICollectionViewFlowLayout {
             let yOffset = ( item / 7 ).f * heightOfItems
             
             attributes.frame = CGRect(x: xOffset, y: yOffset, width: itemSize.width, height: heightOfItems)
+            
+//            if section == 3 {
+            print("section is \(section)")
+                print("indexPath is \(item)")
+                print("xOffset is \(xOffset)")
+                print(collectionView.numberOfItems(inSection: section))
+//            }
             
             if item < firstDay || (item + 1) > (numberOfDays + firstDay) {
                 attributes.alpha = 0.5
