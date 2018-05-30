@@ -8,6 +8,10 @@
 
 import UIKit
 
+//enum LayoutDirection:  {
+//    case
+//}
+
 class CalendarFlowLayout: UICollectionViewFlowLayout {
 
     private let kNumberOfVisibleCells = 3
@@ -73,13 +77,6 @@ class CalendarFlowLayout: UICollectionViewFlowLayout {
             let yOffset = ( item / 7 ).f * heightOfItems
             
             attributes.frame = CGRect(x: xOffset, y: yOffset, width: itemSize.width, height: heightOfItems)
-            
-//            if section == 3 {
-            print("section is \(section)")
-                print("indexPath is \(item)")
-                print("xOffset is \(xOffset)")
-                print(collectionView.numberOfItems(inSection: section))
-//            }
             
             if item < firstDay || (item + 1) > (numberOfDays + firstDay) {
                 attributes.alpha = 0.5

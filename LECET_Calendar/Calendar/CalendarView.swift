@@ -399,7 +399,7 @@ extension CalendarView: UICollectionViewDataSource {
         cell?.dateButton.backgroundColor = UIColor(red: 41/255, green: 160/255, blue: 249/255, alpha: 1)
         
         if isMatchingWithCurrentDateFor(indexPath: indexPath) {
-            cell?.dateButton.backgroundColor = .blue
+            cell?.dateButton.backgroundColor = UIColor(red: 41/255, green: 150/255, blue: 130/255, alpha: 1)
         }
         
         return cell ?? UICollectionViewCell()
